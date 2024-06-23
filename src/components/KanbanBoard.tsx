@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PlusIcon from "../icons/PlusIcon";
 import { Column, Id, Task } from "../types";
 import ColumnContainer from "./ColumnContainer";
@@ -16,14 +16,26 @@ import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
 
+const oldColumnsItems = localStorage.getItem("columns");
+const oldTasksItems = localStorage.getItem("tasks");
+
 const KanbanBoard = () => {
-  const [columns, setColumns] = useState<Column[]>([]);
+  const [columns, setColumns] = useState<Column[]>(
+    JSON.parse(oldColumnsItems as any) || []
+  );
   const columnsId = useMemo(
     () => columns.map((column) => column.id),
     [columns]
   );
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(
+    JSON.parse(oldTasksItems as any) || []
+  );
+
+  useEffect(() => {
+    localStorage.setItem("columns", JSON.stringify(columns));
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [columns, tasks]);
 
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [activeTasks, setActiveTasks] = useState<Task | null>(null);
